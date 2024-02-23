@@ -1,88 +1,28 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
-  View,
   Text,
-  TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
   FlatList,
-} from 'react-native';
-import {useForm, SubmitHandler, FieldValues} from 'react-hook-form';
-import PostCard from '../components/PostCard';
-// import ImagePicker from 'react-native-image-picker';
+  SafeAreaView,
+} from "react-native";
+import PostCard from "../components/PostCard";
+import AddPostModal from "../components/AddPostModal";
+import { metrics } from "../utils/metrics";
 
-interface HomeScreenProps {
-  onSubmit: SubmitHandler<FieldValues>;
-}
-
-const HomeScreen: React.FC<HomeScreenProps> = ({onSubmit}) => {
-  const {
-    handleSubmit,
-    control,
-    setValue,
-    formState: {errors},
-  } = useForm();
-
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  const handleImagePicker = () => {
-    const options = {
-      title: 'Select Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-
-    // ImagePicker.showImagePicker(options, (response) => {
-    //   if (response.uri) {
-    //     setSelectedImage(response.uri);
-    //     setValue('image', response);
-    //   }
-    // });
-  };
+const HomeScreen: React.FC = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <Text>Mesaj:</Text>
-        <TextInput
-          style={styles.input}
-          multiline
-          onChangeText={text => setValue('message', text)}
-        />
-        {errors.message && <Text style={styles.error}>Bu alan zorunludur</Text>}
-      </View>
-
-      <TouchableOpacity
-        style={styles.imagePickerButton}
-        onPress={handleImagePicker}>
-        <Text>Resim Seç</Text>
-      </TouchableOpacity>
-
-      {selectedImage && (
-        <Image
-          source={{uri: selectedImage}}
-          style={styles.selectedImage}
-          resizeMode="cover"
-        />
-      )}
-
-      <TouchableOpacity
-        style={styles.submitButton}
-        onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.submitButtonText}>Paylaş</Text>
-      </TouchableOpacity>
-
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={[0, 1, 2, 3]}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <PostCard
             post={{
               id: 0,
-              message: 'random message',
-              image: 'https://via.placeholder.com/150',
+              message: "random message",
+              image: "https://via.placeholder.com/150",
               likes: 0,
             }}
             onLikePress={() => {}}
@@ -91,51 +31,41 @@ const HomeScreen: React.FC<HomeScreenProps> = ({onSubmit}) => {
           />
         )}
       />
-    </View>
+
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.actionButtonText}>+</Text>
+      </TouchableOpacity>
+
+      <AddPostModal
+        isModalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: "center",
   },
-  inputContainer: {
-    marginBottom: 20,
+  actionButton: {
+    position: "absolute",
+    bottom: metrics.height * 0.05,
+    right: metrics.width * 0.05,
+    backgroundColor: "#3498db",
+    width: metrics.width * 0.12,
+    height: metrics.width * 0.12,
+    borderRadius: metrics.width * 0.06,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  input: {
-    height: 80,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  },
-  error: {
-    color: 'red',
-  },
-  imagePickerButton: {
-    backgroundColor: '#3498db',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  selectedImage: {
-    flex: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  submitButton: {
-    backgroundColor: '#2ecc71',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  actionButtonText: {
+    color: "#fff",
+    fontSize: 24,
   },
 });
 
