@@ -1,19 +1,35 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { FormData, LoginPageProps } from "../types";
+import loginUser from "../utils/helpers";
 
-interface FormData {
-  username: string;
-  password: string;
-}
+const LoginScreen: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
-const LoginScreen: React.FC = () => {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const [loading, setLoading] = React.useState(false);
 
-  const onSubmit = (data: FormData) => {
-    // Form değerlerini kullanarak giriş işlemlerini gerçekleştirin
-    console.log('Form Values:', data);
-    // Örneğin, bir API'ye istek yapabilir ve kullanıcıyı doğrulayabilirsiniz
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    try {
+      await loginUser(data.username, data.password);
+      setIsLoggedIn(true);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,9 +47,11 @@ const LoginScreen: React.FC = () => {
             />
           )}
           name="username"
-          rules={{ required: 'Username is required' }}
+          rules={{ required: "Username is required" }}
         />
-        {errors.username && <Text style={styles.error}>{errors.username.message}</Text>}
+        {errors.username && (
+          <Text style={styles.error}>{errors.username.message}</Text>
+        )}
 
         <Controller
           control={control}
@@ -47,55 +65,65 @@ const LoginScreen: React.FC = () => {
             />
           )}
           name="password"
-          rules={{ required: 'Password is required' }}
+          rules={{ required: "Password is required" }}
         />
-        {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
+        {errors.password && (
+          <Text style={styles.error}>{errors.password.message}</Text>
+        )}
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit(onSubmit)}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,
     marginBottom: 20,
-    color: '#333',
+    color: "#333",
   },
   form: {
     width: width * 0.8,
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     marginBottom: 20,
     paddingLeft: 10,
     borderRadius: 5,
   },
   button: {
-    backgroundColor: '#3498db',
+    backgroundColor: "#3498db",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   error: {
-    color: 'red',
+    color: "red",
     marginBottom: 10,
   },
 });
