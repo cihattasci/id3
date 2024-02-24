@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     position: "absolute",
-    bottom: metrics.height * 0.05,
+    bottom: metrics.width * 0.05,
     right: metrics.width * 0.05,
     backgroundColor: "#3498db",
     width: metrics.width * 0.12,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870161482064",
+    "project_id": "id3-case",
+    "storage_bucket": "id3-case.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870161482064:android:6ead2e263f48268f3a2c55",
+        "android_client_info": {
+          "package_name": "com.id3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnXBLSSoqsYXTceb0sMW1g7ImjNZ-ludw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
