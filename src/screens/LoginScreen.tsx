@@ -5,12 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { FormData, LoginPageProps } from "../types";
-import loginUser from "../utils/helpers";
+import { loginUser } from "../utils/helpers";
+import { metrics } from "../utils/metrics";
 
 const LoginScreen: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
   const {
@@ -87,8 +87,6 @@ const LoginScreen: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
   );
 };
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -102,7 +100,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   form: {
-    width: width * 0.8,
+    width: metrics.width * 0.8,
   },
   input: {
     height: 40,
