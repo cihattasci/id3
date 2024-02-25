@@ -6,11 +6,22 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
-import { metrics } from "../utils/metrics";
 import ImagePicker from "react-native-image-crop-picker";
+import { useDispatch } from "react-redux";
+import {
+  useForm,
+  SubmitHandler,
+  FieldValues,
+  Controller,
+} from "react-hook-form";
+import { metrics } from "../utils/metrics";
+import { addCardToCloud, uploadToStorage } from "../utils/helpers";
+import { colors } from "../utils/colors";
+import { addCard } from "../store/slices/CardSlice";
 
 interface AddModalProps {
   isModalVisible: boolean;
@@ -21,69 +32,109 @@ const AddPostModal: React.FC<AddModalProps> = ({
   isModalVisible,
   setModalVisible,
 }) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const {
     handleSubmit,
     control,
     setValue,
     formState: { errors },
   } = useForm();
+
+  const dispatch = useDispatch();
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const handleImagePicker = () => {
     if (!!selectedImage) {
       setSelectedImage(null);
     } else {
       ImagePicker.openPicker({
         multiple: false,
-      }).then(async (pickerImage) => {
-        setSelectedImage(pickerImage.path);
-        // const task = reference
-        //   .child('profileImage.png')
-        //   .putFile(pickerImage.path);
-        // task.on('state_changed', taskSnapshot => {
-        //   let rate = (
-        //     (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-        //     100
-        //   ).toFixed(2);
-        //   setUploadRate(parseInt(rate));
-        // });
-        // task.then(async () => {
-        //   const url = await reference.child('profileImage.png').getDownloadURL();
-        //   setUrl(url);
-        //   setLoading(false);
-        //   setUploadRate(0);
-        // });
-      });
+      })
+        .then(async (pickerImage) => {
+          setSelectedImage(pickerImage.path);
+        })
+        .catch((error) => {
+          Alert.alert("Error", "Error while selecting image");
+          setSelectedImage(null);
+        });
     }
   };
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    setLoading(true);
+    try {
+      let imageData: {
+        url: string;
+        name: string;
+      } = {
+        url: "",
+        name: "",
+      };
+
+      if (selectedImage) {
+        const result = await uploadToStorage(selectedImage);
+        imageData = {
+          url: result.url,
+          name: result.name || "",
+        };
+      }
+
+      const cardItem = await addCardToCloud(data.message, imageData);
+      dispatch(addCard(cardItem));
+
+      setModalVisible(false);
+      setValue("message", "");
+      setSelectedImage(null);
+    } catch (error) {
+      Alert.alert("Error uploading post");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal visible={isModalVisible} transparent animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.inputContainer}>
             <View style={styles.topGroup}>
-              <Text style={styles.titleMessage}>Mesaj:</Text>
+              <Text style={styles.titleMessage}>Message:</Text>
               <TouchableOpacity
                 style={styles.imagePickerButton}
                 onPress={handleImagePicker}
+                disabled={loading}
               >
                 {!selectedImage ? (
-                  <Text style={styles.titleSelectPhoto}>Fotoğraf Seç</Text>
+                  <Text style={styles.titleSelectPhoto}>Select photo</Text>
                 ) : (
                   <Text style={styles.titleUnselectPhoto}>
-                    Fotoğrafı Kaldır
+                    Remove selected photo
                   </Text>
                 )}
               </TouchableOpacity>
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Mesajınızı girin"
-              placeholderTextColor={"gray"}
-              multiline
-              onChangeText={(text) => setValue("message", text)}
+
+            <Controller
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  style={styles.input}
+                  value={field.value}
+                  placeholder="Type your message here..."
+                  placeholderTextColor={"gray"}
+                  multiline
+                  editable={!loading}
+                  onChangeText={(text) =>
+                    setValue("message", text, { shouldValidate: true })
+                  }
+                />
+              )}
+              name="message"
+              rules={{ required: "Message is required" }}
             />
             {errors.message && (
-              <Text style={styles.error}>Bu alan zorunludur</Text>
+              <Text style={styles.error}>This field required</Text>
             )}
           </View>
 
@@ -95,20 +146,24 @@ const AddPostModal: React.FC<AddModalProps> = ({
             />
           )}
 
-          <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={styles.submitButton}
-              // onPress={handleSubmit(onSubmit)}
-            >
-              <Text style={styles.submitButtonText}>Paylaş</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Kapat</Text>
-            </TouchableOpacity>
-          </View>
+          {!loading ? (
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSubmit(onSubmit)}
+              >
+                <Text style={styles.submitButtonText}>Share</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <ActivityIndicator size="large" color={colors.black} />
+          )}
         </View>
       </View>
     </Modal>
