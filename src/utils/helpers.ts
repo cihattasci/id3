@@ -26,10 +26,10 @@ export const logOut = async (setIsLoggedIn: (value: boolean) => void) => {
 
 export const getCurrentUser = () => auth().currentUser;
 
-export const fetchCards = async () => {
+export const fetchCards = async (sort: "createdAt" | "likeUsers") => {
   const cards = await firestore()
     .collection("cards")
-    .orderBy("createdAt", "desc")
+    .orderBy(sort, "desc")
     .get();
   return cards.docs.map((card) => ({ ...card.data() }));
 };
@@ -86,9 +86,12 @@ export const deletePostFromCloud = async (id: string) => {
   const doc = await getDocument(id);
 
   await firestore().collection("cards").doc(doc.id).delete();
-  await storage()
-    .ref(`images/${await getUserId()}/${doc.data().imagePath}`)
-    .delete();
+
+  if (!!doc.data().imagePath) {
+    await storage()
+      .ref(`images/${await getUserId()}/${doc.data().imagePath}`)
+      .delete();
+  }
 };
 
 export const likeCardPost = async (

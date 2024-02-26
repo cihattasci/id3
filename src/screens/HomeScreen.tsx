@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  View,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -15,15 +16,18 @@ import { RootState } from "../store/store";
 import { fetchCards } from "../utils/helpers";
 import { setCards } from "../store/slices/CardSlice";
 import { CardInterface } from "../types";
+import { colors } from "../utils/colors";
+import FilterGroup from "../components/FilterGroup";
 
 const HomeScreen: React.FC = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [sort, setSort] = useState<"createdAt" | "likeUsers">("createdAt");
 
   const cards = useSelector((state: RootState) => state.card.cards);
   const dispatch = useDispatch();
 
   const fetchCardPosts = async (): Promise<CardInterface[]> => {
-    const response = await fetchCards();
+    const response = await fetchCards(sort);
 
     const mappedResponse: CardInterface[] = response.map((item: any) => ({
       id: item.id,
@@ -46,29 +50,37 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     getCard();
-  }, []);
+  }, [sort]);
+
+  const handleSort = (type: "createdAt" | "likeUsers") => {
+    setSort(type);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={cards}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PostCard card={item} />}
-        ListEmptyComponent={() => <EmptyCardList />}
-        scrollEnabled={!!cards?.length}
-      />
+      <View style={styles.groupContainer}>
+        <FilterGroup handleSort={handleSort} sort={sort} />
 
-      <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.actionButtonText}>+</Text>
-      </TouchableOpacity>
+        <FlatList
+          data={cards}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <PostCard card={item} />}
+          ListEmptyComponent={() => <EmptyCardList />}
+          scrollEnabled={!!cards?.length}
+        />
 
-      <AddPostModal
-        isModalVisible={isModalVisible}
-        setModalVisible={setModalVisible}
-      />
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.actionButtonText}>+</Text>
+        </TouchableOpacity>
+
+        <AddPostModal
+          isModalVisible={isModalVisible}
+          setModalVisible={setModalVisible}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -76,13 +88,17 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    paddingBottom: 10,
+  },
+  groupContainer: {
+    flex: 1,
+    marginTop: metrics.navbarHeight,
   },
   actionButton: {
     position: "absolute",
     bottom: metrics.width * 0.05,
     right: metrics.width * 0.05,
-    backgroundColor: "#3498db",
+    backgroundColor: colors.idBlue,
     width: metrics.width * 0.12,
     height: metrics.width * 0.12,
     borderRadius: metrics.width * 0.06,
@@ -90,7 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   actionButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 24,
   },
 });
