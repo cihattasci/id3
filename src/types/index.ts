@@ -13,6 +13,11 @@ export interface PostCardProps {
   card: CardInterface;
 }
 
+export interface FilterGroupProps {
+  sort: "createdAt" | "likeUsers";
+  handleSort: (type: "createdAt" | "likeUsers") => void;
+}
+
 export interface CardCommentInterface {
   id: string;
   message: string;

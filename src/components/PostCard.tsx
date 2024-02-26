@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   TextInput,
+  FlatList,
 } from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import { useDispatch } from "react-redux";
@@ -20,6 +21,7 @@ import {
 } from "../utils/helpers";
 import { addComment, deleteCard, likeCard } from "../store/slices/CardSlice";
 import Loading from "./Loading";
+import { colors } from "../utils/colors";
 
 const PostCard: React.FC<PostCardProps> = ({ card }) => {
   const dispatch = useDispatch();
@@ -144,19 +146,22 @@ const PostCard: React.FC<PostCardProps> = ({ card }) => {
           </View>
         )}
       </View>
-      {!!card.comments.length &&
-        card.comments.map((comment, index) => (
+      <FlatList
+        data={card.comments}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => (
           <View style={styles.cardComment}>
-            <Text key={index}>{comment.message}</Text>
+            <Text key={index}>{item.message}</Text>
           </View>
-        ))}
+        )}
+      />
     </>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     borderRadius: 8,
     padding: 10,
     borderWidth: 1,
@@ -165,7 +170,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   cardComment: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     borderRadius: 8,
     padding: 10,
     borderWidth: 1,
@@ -194,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   actionButton: {
-    color: "#3498db",
+    color: colors.idBlue,
     fontWeight: "bold",
     marginRight: 10,
   },

@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     maxHeight: metrics.height,
     width: metrics.width,
     padding: 20,
@@ -250,25 +250,25 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
-    backgroundColor: "#2ecc71",
+    backgroundColor: colors.green,
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
   },
   submitButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
   },
   closeButton: {
     flex: 1,
-    backgroundColor: "#e74c3c",
+    backgroundColor: colors.red,
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
   },
   closeButtonText: {
     flex: 1,
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
   },
 });

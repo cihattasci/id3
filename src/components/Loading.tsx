@@ -1,18 +1,17 @@
-import { View, ActivityIndicator, StyleSheet } from "react-native";
 import React from "react";
-import { metrics } from "../utils/metrics";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { colors } from "../utils/colors";
 
 export default function Loading() {
   return (
     <View style={styles.loading}>
-      <ActivityIndicator size="large" color="#3498db" />
+      <ActivityIndicator size="large" color={colors.idBlue} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   loading: {
-    height: metrics.height,
     justifyContent: "center",
     alignItems: "center",
   },

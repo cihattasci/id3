@@ -1,9 +1,15 @@
-import { Dimensions } from "react-native";
+import { Dimensions, Platform } from "react-native";
 import { colors } from "./colors";
 
+const window = Dimensions.get("window");
+const screenHeight = Dimensions.get("screen").height;
+const windowHeight = window.height;
+const navbarHeight = screenHeight - windowHeight;
+
 export const metrics = {
-  height: Dimensions.get("window").height,
-  width: Dimensions.get("window").width,
+  height: window.height,
+  width: window.width,
+  navbarHeight: Platform.OS === "ios" ? 0 : navbarHeight + 10,
 };
 
 export const tabHeaderStyles = {
@@ -13,5 +19,5 @@ export const tabHeaderStyles = {
   headerStyle: {
     backgroundColor: colors.white,
   },
-  headerTitle: '',
+  headerTitle: "",
 };

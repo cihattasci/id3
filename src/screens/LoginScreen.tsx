@@ -11,6 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { FormData, LoginPageProps } from "../types";
 import { loginUser } from "../utils/helpers";
 import { metrics } from "../utils/metrics";
+import { colors } from "../utils/colors";
 
 const LoginScreen: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
   const {
@@ -77,7 +78,7 @@ const LoginScreen: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={colors.white} />
           ) : (
             <Text style={styles.buttonText}>Login</Text>
           )}
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   title: {
     fontSize: 28,
@@ -111,13 +112,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   button: {
-    backgroundColor: "#3498db",
+    backgroundColor: colors.idBlue,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
   },
   error: {
